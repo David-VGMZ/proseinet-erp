@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almacen Proseinet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="apple-touch-icon" href="/img/Logo-proseinet-rojo.png" />
+    <link rel="icon" href="/img/Logo-proseinet-rojo.png" />
+    <link rel="stylesheet" href="/css/app.css?=0.620">
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script type="module" src="/app.js?=1.705"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <div id="login-screen" class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
+        <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%; border-radius: 15px;">
+            <div class="text-center mb-4">
+                <img src="/img/Logo-proseinet-rojo.png" alt="Proseinet Logo" width="120">
+                <h4 class="mt-3 fw-bold">Acceso al Sistema</h4>
+            </div>
+            <form id="login-form">
+                <div class="mb-3">
+                    <input type="email" id="login-email" class="form-control border-0 border-bottom" required
+                        placeholder="Correo Electrónico">
+                </div>
+                <div class="mb-3">
+                    <div class="input-group">
+                        <input type="password" id="login-pass" class="form-control border-0 border-bottom" required
+                            placeholder="Contraseña">
+                        <button class="btn btn-outline-secondary border-0 border-bottom" type="button"
+                            id="toggle-password" title="Mostrar/Ocultar contraseña">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" id="btnEntrar" class="btn btn-danger w-100 py-2 fw-bold">Entrar</button>
+            </form>
+            <div id="login-error" class="text-danger small mt-3 text-center" style="display: none;"></div>
+        </div>
+    </div>
+    <div id="app-content" style="display: none;">
+        <div class="d-flex">
+            <nav class="sidebar p-3">
+                <div class="d-flex align-items-center justify-content-between mb-3 brand-section">
+                    <div></div>
+                    <img id="sidebarLogo" onclick="scrollToTop()" src="/img/Proseinet-Logo-Web.png" alt="proseinet-logo"
+                        width="100" style="cursor: pointer; transition: all 0.3s ease;">
+                    <div class="d-md-none d-block"></div>
+                    <button id="btnToggleSidebar" class="btn text-white p-1 border-0"
+                        style="background: transparent; font-size: 1.25rem;">
+                        <i class="bi bi-chevron-left" id="toggleIcon"></i>
+                    </button>
+                </div>
+                <hr>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link fw-bold" href="" id="btnImportarExcel"><i
+                                class="fa-solid fa-file-excel me-2"></i><span class="menu-text">Importar
+                                Excel</span></a>
+                    </li>
+                    <li class="nav-item" style="cursor: pointer;">
+                        <a class="nav-link fw-bold" id="btnExportarExcel"><i
+                                class="fa-solid fa-file-export me-2"></i><span class="menu-text">Exportar a
+                                Excel</span></a>
+                    </li>
+                    <li class="nav-item" onclick="abrirResumenModelos()">
+                        <a class="nav-link fw-bold" style="cursor: pointer;"><i
+                                class="fa-solid fa-list-ol me-2"></i><span class="menu-text">Ver
+                                Stock</span></a>
+                    </li>
+                    <input type="file"
+                        accept=".csv, .xlsx, .xls, .ods, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, application/vnd.oasis.opendocument.spreadsheet"
+                        id="inputFileExcel" style="display: none;">
+                    <li class="nav-item" style="display: none;">
+                        <a class="nav-link fw-bold" href="#" onclick="sincronizarStockTienda()">
+                            <i class="fa-solid fa-cloud-arrow-up me-2"></i> <span class="menu-text">Sincronizar
+                                Stock</span>
+                        </a>
+                    </li>
+                    <li class="nav-item w-100">
+                        <a class="nav-link collapsed d-flex align-items-center fw-bold" href="#"
+                            data-bs-toggle="collapse" data-bs-target="#submenuDocumentos" aria-expanded="false">
+                            <i class="fa-solid fa-folder-open me-2"></i>
+                            <span class="menu-text">Documentos</span>
+                            <i class="fa-solid fa-chevron-down ms-auto toggle-arrow" style="font-size: 0.8em;"></i>
+                        </a>
+
+                        <div class="collapse" id="submenuDocumentos">
+                            <ul class="nav flex-column ms-3 mt-1" style="font-size: 0.95em;">
+                                <li class="nav-item">
+                                    <a class="nav-link" style="cursor: pointer;" href="#"
+                                        onclick="abrirCotizacionManual()">
+                                        <i class="fa-solid fa-file-invoice me-2"></i>Nueva Cotización
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" style="cursor: pointer;" href="#" id="btnExportarNota">
+                                        <i class="fa-solid fa-receipt me-2"></i>Nueva Nota de Venta
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" style="cursor: pointer;" href="#"
+                                        onclick="abrirHistorialCotizaciones()">
+                                        <i class="fa-solid fa-clock-rotate-left me-2"></i>Historial de Docs
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" style="cursor: pointer;" href="#"
+                                        onclick="generarActaEquiposSeleccionados()">
+                                        <i class="fa-solid fa-file-signature me-2"></i>Acta de Entrega
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item" onclick="abrirContenedorRegistros()">
+                        <a class="nav-link fw-bold" style="cursor: pointer;">
+                            <i class="fa-solid fa-box-archive me-2"></i><span class="menu-text">Contenedor</span>
+                            <span id="badgeContenedor" class="badge bg-danger ms-2" style="display: none;">0</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="nav flex-column position-absolute mt-auto p-1 my-3 bottom-0">
+                    <hr>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" id="btnUsuario"><i class="fa-solid fa-user me-2"></i><span
+                                class="menu-text">admin@proseinet.mx</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="btnCerrarSesion"><i
+                                class="fa-solid fa-right-from-bracket me-2"></i><span class="menu-text">Cerrar
+                                Sesión</span></a>
+                    </li>
+                </ul>
+            </nav>
+
+            <main class="flex-grow-1 p-4 main-content">
+                <div
+                    class="d-md-none d-flex justify-content-between align-items-center mb-4 bg-white p-3 shadow-sm rounded-3">
+                    <div class="d-flex align-items-center">
+                        <img src="/img/Logo-proseinet-rojo.png" alt="Proseinet Logo" width="35" class="me-2">
+                        <h5 class="m-0 fw-bold title-text" style="font-size: 18px;">PROSEINET</h5>
+                    </div>
+                    <button class="btn btn-light border shadow-sm" id="btnMobileMenu">
+                        <i class="bi bi-list fs-4"></i>
+                    </button>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-4 mb-lg-2">
+                    <div class="col-md-2 kpi-totales-titulo">
+                        <h2 class="title-text me-3 d-none d-md-block">Gestión de Almacén</h2>
+                        <div class="text-center">
+                            <h6 id="kpiTotalEstatus">$0</h6>
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-2 col-md-10">
+                        <div class="col-md-3 kpi-card-container" data-estatus="" onclick="filtrarPorEstatusCard('')"
+                            style="cursor: pointer;">
+                            <div class="card kpi-total h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fa-solid fa-box me-2"></i>Total de Productos</h6>
+                                    <h4 class="mb-0" id="kpiTotal">0 Piezas(s)</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 kpi-card-container" data-estatus="en garantía"
+                            onclick="filtrarPorEstatusCard('en garantía')" style="cursor: pointer;">
+                            <div class="card shadow-md kpi-garantia h-100 card-kpi-hover">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa-solid fa-shield-halved me-2"></i>En Garantía
+                                    </h5>
+                                    <h4 class="mb-0" id="kpiGarantia">0 Piezas(s)</h4>
+                                    <p class="mb-0" id="kpiValorGarantia">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 kpi-card-container" data-estatus="por habilitar"
+                            onclick="filtrarPorEstatusCard('por habilitar')" style="cursor: pointer;">
+                            <div class="card shadow-md kpi-habilitar h-100 card-kpi-hover">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa-solid fa-check-to-slot me-2"></i>Por Habilitar
+                                    </h5>
+                                    <h4 class="mb-0" id="kpiHabilitar">0 Piezas(s)</h4>
+                                    <p class="mb-0" id="kpiValorHabilitar">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 kpi-card-container" data-estatus="proceso"
+                            onclick="filtrarPorEstatusCard('proceso')" style="cursor: pointer;">
+                            <div class="card shadow-md kpi-proceso h-100 card-kpi-hover">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa-solid fa-truck-arrow-right me-2"></i>En Proceso
+                                    </h5>
+                                    <h4 class="mb-0" id="kpiProceso">0 Piezas(s)</h4>
+                                    <p class="mb-0" id="kpiValorProceso">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 kpi-card-container" data-estatus="vendido"
+                            onclick="filtrarPorEstatusCard('vendido')" style="cursor: pointer;">
+                            <div class="card shadow-md kpi-vendido h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa-solid fa-money-bill-trend-up me-2"></i>Vendidos
+                                    </h5>
+                                    <h4 class="mb-0" id="kpiVendidos">0 Piezas(s)</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 kpi-card-container" data-estatus="almacén"
+                            onclick="filtrarPorEstatusCard('almacén')" style="cursor: pointer;">
+                            <div class="card shadow-md kpi-almacen h-100 card-kpi-hover">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa-solid fa-building me-2"></i>En Almacén</h5>
+                                    <h4 class="mb-0" id="kpiAlmacen">0 Piezas(s)</h4>
+                                    <p class="mb-0" id="kpiValorAlmacen">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 kpi-card-container" data-estatus="falta pza"
+                            onclick="filtrarPorEstatusCard('falta pza')" style="cursor: pointer;">
+                            <div class="card shadow-md kpi-falta-pza h-100 card-kpi-hover">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa-solid fa-screwdriver-wrench me-2"></i>Falta
+                                        Pieza(s)
+                                    </h5>
+                                    <h4 class="mb-0" id="kpiPiezas">0 Piezas(s)</h4>
+                                    <p class="mb-0" id="kpiValorPiezas">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 kpi-card-container" data-condicion="remate"
+                            onclick="filtrarPorCondicionCard('remate')" style="cursor: pointer;">
+                            <div class="card shadow-md kpi-remate h-100 card-kpi-hover">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fa-solid fa-tag me-2"></i>Remate</h5>
+                                    <h4 class="mb-0" id="kpiRemate">0 Piezas(s)</h4>
+                                    <p class="mb-0" id="kpiValorRemate">$0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4 sticky-top" style="top: 15px; z-index: 1040; border-radius: 12px;">
+                    <div class="card-body p-3">
+                        <div class="row g-2 align-items-center">
+
+                            <div class="col-12 col-md-3">
+                                <div class="input-group input-group-sm" style="overflow: hidden;">
+                                    <span class="input-group-text" style="background-color: #eeeeee !important;"><i
+                                            class="bi bi-search text-muted"></i></span>
+                                    <input type="text" class="form-control ps-0" id="buscadorGeneral"
+                                        placeholder="Buscar serie, modelo, cliente..."
+                                        style="background-color: #eeeeee !important; border: 1px solid #eeeeee !important;"><a
+                                        style="cursor: pointer; background-color: #eeeeee !important;"
+                                        class="nav-link text-secondary py-1 pe-2" title="limpiar buscador"
+                                        onclick="limpiarBuscador()"><i class="fa-solid fa-xmark"></i></a>
+                                </div>
+                            </div>
+
+                            <div class="col-6 col-md-2">
+                                <select class="form-select form-select-sm border-1" style="background-color: #eeeeee;"
+                                    id="filtroCategoria">
+                                    <option value="">Categorías (Todas)</option>
+                                    <option value="LAPTOP">Laptop</option>
+                                    <option value="ESCRITORIO">Escritorio</option>
+                                    <option value="MONITOR">Monitor</option>
+                                    <option value="ALL IN ONE">All in One</option>
+                                    <option value="WORKSTATION">Workstation</option>
+                                    <option value="TABLET">Tablet</option>
+                                    <option value="SERVER">Server</option>
+                                    <option value="PROYECTORES">Proyectores</option>
+                                    <option value="Docking">Docking</option>
+                                    <option value="OTROS">Otros</option>
+                                </select>
+                            </div>
+
+                            <select class="form-select d-none" id="filtroEstatus">
+                                <option value="">Todos</option>
+                                <option value="almacén">Almacén</option>
+                                <option value="proceso">Proceso</option>
+                                <option value="por habilitar">Por Habilitar</option>
+                                <option value="vendido">Vendido</option>
+                                <option value="en garantía">Garantia</option>
+                                <option value="falta pza">Falta Pza(s)</option>
+                            </select>
+
+                            <div class="col-6 col-md-2">
+                                <select class="form-select form-select-sm border-1" style="background-color: #eeeeee;"
+                                    id="filtroCondicion">
+                                    <option value="">Condición (Todas)</option>
+                                    <option value="NUEVO">Nuevo</option>
+                                    <option value="SEMINUEVO">Seminuevo</option>
+                                    <option value="USADO">Usado</option>
+                                    <option value="REFURBISHED">Refurbished</option>
+                                    <option value="REMATE">Remate</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 col-md-3">
+                                <div class="input-group input-group-sm" style="background-color: #eeeeee;">
+                                    <span class="input-group-text border-1 border-end-0"
+                                        style="background-color: #eeeeee;"><i
+                                            class="bi bi-calendar3 text-muted"></i></span>
+                                    <input type="date" class="form-control border-1 border-end-0 border-start-0"
+                                        style="background-color: #eeeeee;" id="filtroFechaInicio" title="Fecha Inicio">
+                                    <input type="date" class="form-control border-1 border-start-0 ms-1"
+                                        style="background-color: #eeeeee;" id="filtroFechaFin" title="Fecha Fin">
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-md-2 d-flex justify-content-end gap-1">
+                                <button class="btn btn-sm btn-dark" id="btnBuscar" title="Buscar"
+                                    onclick="scrollToTableHeader()"><i
+                                        class="fa-solid fa-magnifying-glass"></i></button>
+                                <button class="btn btn-sm btn-secondary" id="btnLimpiarFiltros"
+                                    title="Limpiar Filtros"><i class="fa-solid fa-trash"></i></button>
+                                <button class="btn btn-sm btn-danger text-white" id="btnExportarPDF"
+                                    title="Exportar consulta actual a PDF"><i
+                                        class="fa-solid fa-file-export"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 border-top pt-3">
+                            <div class="col-12 d-flex justify-content-between align-items-center">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-dark dropdown-toggle rounded-pill px-3" type="button"
+                                        id="btnAccionesMultiples" data-bs-toggle="dropdown" aria-expanded="false"
+                                        disabled>
+                                        <i class="bi bi-list-check me-1"></i> Acciones Múltiples
+                                    </button>
+                                    <ul class="dropdown-menu shadow-sm">
+                                        <li><a class="dropdown-item" href="#" onclick="cambiarEstatusSeleccionados()"><i
+                                                    class="fa-solid fa-chart-simple me-2"></i>Cambiar Estatus</a></li>
+                                        <li><a class="dropdown-item" href="#"
+                                                onclick="abrirModalEditarFechasSeleccionados()"><i
+                                                    class="fa-solid fa-calendar me-2"></i>Editar Fechas</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="cotizarSeleccionados()"><i
+                                                    class="fa-solid fa-file-circle-plus me-2"></i>Cotizar
+                                                Seleccionados</a>
+                                        </li>
+                                        <li><a class="dropdown-item" href="#" onclick="deseleccionarItems()"><i
+                                                    class="fa-solid fa-list-ul me-2"></i>Deseleccionar Todos</a>
+                                        </li>
+                                        <li id="eliminarSeleccionadosLiHr">
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li id="eliminarSeleccionadosLi"><a class="dropdown-item text-danger fw-bold"
+                                                href="#" onclick="eliminarSeleccionados()"><i
+                                                    class="fa-solid fa-trash me-2"></i>Eliminar Seleccionados</a></li>
+                                    </ul>
+                                </div>
+                                <button class="btn btn-sm btn-dark rounded-pill px-3" data-bs-toggle="modal"
+                                    data-bs-target="#modalNuevoRegistro">
+                                    <i class="fa-solid fa-plus me-1"></i> Nuevo Equipo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                    <div class="text-muted small">
+                        <strong>Página <span id="numPagina">1</span></strong> | Mostrando <span
+                            id="numMostrados">0</span> - <span id="numTotalMostrados">50</span> de <strong><span
+                                id="totalFiltrados">0</span></strong> Productos
+                    </div>
+                    <nav aria-label="Navegación de inventario">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item"><button class="page-item btn btn-sm btn-light border-0 me-2"
+                                    id="btnInicio" disabled>Inicio</button></li>
+                            <li class="page-item"><button class="page-item btn btn-sm btn-light border-0 me-2"
+                                    id="btnAnterior" disabled>Anterior</button></li>
+                            <li class="page-item"><button class="page-item btn btn-sm btn-light border-0"
+                                    id="btnSiguiente">Siguiente</button></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="card shadow-sm mb-5">
+                    <div class="card-body p-0 table-responsive"
+                        style="max-height: 65vh; min-height: 350px; overflow-y: auto;">
+                        <table class="table table-hover table-striped mb-0" id="tablaInventario">
+                            <thead class="table-dark" style="position: sticky; top: 0; z-index: 1020;">
+                                <tr id="cabeceraTabla">
+                                    <th style="width: 40px;"><input type="checkbox" class="form-check-input"
+                                            id="chkSelectAll" onclick="toggleSelectAll(this)"></th>
+                                    <th style="min-width: 140px;">Serie</th>
+                                    <th>Categoría</th>
+                                    <th>Marca & Modelo</th>
+                                    <th>CPU & RAM</th>
+                                    <th>Cliente</th>
+                                    <th>Precio</th>
+                                    <th>Condicion</th>
+                                    <th>Estatus</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTabla">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <div class="modal fade" id="modalNuevoRegistro" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge info"><i class="fa-solid fa-circle-plus"></i></div>
+                            Registrar Nuevo Equipo
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formRegistro" class="row g-3">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2">Información General</h6>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Lote</label>
+                                <input type="text" class="form-control bg-light" id="regLot">
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Serie</label>
+                                <input type="text" class="form-control bg-light" id="regSerie" required>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Categoría</label>
+                                <select class="form-select bg-light" id="regCategoria">
+                                    <option value="LAPTOP">LAPTOP</option>
+                                    <option value="ESCRITORIO">ESCRITORIO</option>
+                                    <option value="MONITOR">MONITOR</option>
+                                    <option value="ALL IN ONE">ALL IN ONE</option>
+                                    <option value="WORKSTATION">WORKSTATION</option>
+                                    <option value="TABLET">TABLET</option>
+                                    <option value="SERVER">SERVER</option>
+                                    <option value="PROYECTORES">PROYECTORES</option>
+                                    <option value="Docking">Docking</option>
+                                    <option value="OTROS">OTROS</option>
+                                    <option value="">SIN CATEGORIA</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Condición</label>
+                                <select class="form-select bg-light" id="regCondicion">
+                                    <option value="NUEVO">NUEVO</option>
+                                    <option value="SEMINUEVO">SEMINUEVO</option>
+                                    <option value="USADO">USADO</option>
+                                    <option value="REFURBISHED">REFURBISHED</option>
+                                    <option value="NO DEFINIDA">NO DEFINIDA</option>
+                                    <option value="REMATE">REMATE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Estatus</label>
+                                <select class="form-select bg-light" id="regEstatus">
+                                    <option value="Almacén">Almacén</option>
+                                    <option value="Proceso">Proceso</option>
+                                    <option value="Por habilitar">Por Habilitar</option>
+                                    <option value="Vendido">Vendido</option>
+                                    <option value="En garantía">En Garantía</option>
+                                    <option value="Falta Pza">Falta Pza</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-2">Logística y Precios</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Cliente Asignado</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control bg-light" id="regCliente"
+                                        placeholder="Ej. Juan Pérez">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Precio Mayorista</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control bg-light" id="regPrecioMayorista"
+                                        placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Precio Público</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control bg-light" id="regPrecioPublico"
+                                        placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Fecha de Pago</label>
+                                <input type="date" class="form-control bg-light" id="regFechaPago">
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Fecha de Entrega</label>
+                                <input type="date" class="form-control bg-light" id="regFechaEntrega">
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Tipo de Cliente</label>
+                                <select class="form-select bg-light" id="regTipoClienteNuevo">
+                                    <option value="publico" selected>Usuario Final</option>
+                                    <option value="mayorista">Mayorista</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-2">Hardware Base</h6>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Marca</label>
+                                <input type="text" class="form-control bg-light" id="regMarca">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Modelo</label>
+                                <input type="text" class="form-control bg-light" id="regModelo">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Procesador</label>
+                                <input type="text" class="form-control bg-light" id="regProcesador">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Memoria RAM</label>
+                                <input type="text" class="form-control bg-light" id="regRam">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">Generación (Proc.)</label>
+                                <input type="text" class="form-control bg-light" id="regGeneracion"
+                                    placeholder="Ej. 10ma Gen">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Velocidad (Proc.)</label>
+                                <input type="text" class="form-control bg-light" id="regVelocidad"
+                                    placeholder="Ej. 2.4 GHz">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Tipo de RAM</label>
+                                <input type="text" class="form-control bg-light" id="regTipoRam" placeholder="Ej. DDR4">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Video Dedicado</label>
+                                <input type="text" class="form-control bg-light" id="regVideo"
+                                    placeholder="Ej. GTX 1650">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Descripción de Video</label>
+                                <input type="text" class="form-control bg-light" id="regDescVideo"
+                                    placeholder="Ej. Tarjeta dedicada para diseño">
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-2">Almacenamiento y Detalles</h6>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Disco Mecánico</label>
+                                <input type="text" class="form-control bg-light" id="regHdd">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Disco Sólido</label>
+                                <input type="text" class="form-control bg-light" id="regSsd">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Disco Extra</label>
+                                <input type="text" class="form-control bg-light" id="regDiscoExtra"
+                                    placeholder="Ej. 1TB">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Capacidad Extra</label>
+                                <input type="text" class="form-control bg-light" id="regCapacidadExtra"
+                                    placeholder="Ej. 1TB">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Pantalla</label>
+                                <input type="text" class="form-control bg-light" id="regPantalla">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Sistema Operativo</label>
+                                <input type="text" class="form-control bg-light" id="regOs">
+                            </div>
+
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Color</label>
+                                <input type="text" class="form-control bg-light" id="regColor" placeholder="Ej. Plata">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Licencia</label>
+                                <input type="text" class="form-control bg-light" id="regLicencia"
+                                    placeholder="Ej. OEM Original">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Cámara</label>
+                                <input type="text" class="form-control bg-light" id="regCam" placeholder="Sí / No">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">CD/DVD</label>
+                                <input type="text" class="form-control bg-light" id="regCdDvd" placeholder="Sí / No">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Wi-Fi</label>
+                                <input type="text" class="form-control bg-light" id="regWifi" placeholder="Sí / No">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Bluetooth</label>
+                                <input type="text" class="form-control bg-light" id="regBluetooth"
+                                    placeholder="Sí / No">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Observaciones de Estética</label>
+                                <textarea class="form-control bg-light" id="regEstetica" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Comentarios Generales</label>
+                                <textarea class="form-control bg-light" id="regComentarios" rows="2"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-danger border-0" id="btnLimpiarNuevosRegistros"><i
+                                class="fa-solid fa-trash me-2"></i>Limpiar</button>
+                        <button type="button" class="btn btn-light" id="btnAbrirModalClonar"><i
+                                class="fa-solid fa-search me-2"></i>Buscar Modelo</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" form="formRegistro" class="btn btn-primary" id="btnRegistrarEquipo"><i
+                                class="fa-solid fa-floppy-disk me-2"></i>Registrar
+                            Equipo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalClonarEquipo" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge success"><i class="fa-solid fa-search"></i></div>
+                            Buscar Equipo Base
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="p-3 bg-light border-bottom d-flex gap-2">
+                        <input type="text" class="form-control" id="buscadorClonar"
+                            placeholder="Buscar por marca, modelo, procesador...">
+                        <select class="w-50 form-select form-select-sm bg-light" id="filtroCategoriaClonar">
+                            <option value="">Categoría (Todas)</option>
+                            <option value="LAPTOP">Laptop</option>
+                            <option value="ESCRITORIO">Escritorio</option>
+                            <option value="MONITOR">Monitor</option>
+                            <option value="ALL IN ONE">All in One</option>
+                            <option value="WORKSTATION">Workstation</option>
+                            <option value="TABLET">Tablet</option>
+                            <option value="SERVER">Server</option>
+                            <option value="PROYECTORES">Proyectores</option>
+                            <option value="Docking">Docking</option>
+                            <option value="OTROS">Otros</option>
+                        </select>
+                        <button id="btnBuscarClonar" class="btn btn-dark"><i class="bi bi-search"></i></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th>Marca y Modelo</th>
+                                    <th>Procesador</th>
+                                    <th class="text-center">RAM</th>
+                                    <th class="text-center">Almacenamiento</th>
+                                    <th class="text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTablaClonar">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalDetallesEquipo" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge dark"><i class="fa-solid fa-microchip"></i></div>
+                            Ficha Técnica Completa
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="detalleContenido" class="row g-3">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="modalEsperaImportacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-body text-center p-5">
+                        <div class="spinner-border text-primary mb-4" style="width: 3rem; height: 3rem;" role="status">
+                        </div>
+                        <h4 class="fw-bold">Sincronizando Almacenamiento</h4>
+                        <p class="text-muted mb-0">Por favor, <strong>no cierres esta pestaña ni el navegador</strong>.
+                        </p>
+                        <p class="small text-secondary">Estamos actualizando registros y procesando números de serie...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="modalPDFLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-body text-center p-5">
+                        <div class="spinner-border text-primary mb-4" style="width: 3rem; height: 3rem;" role="status">
+                        </div>
+                        <h4 class="fw-bold">Exportando a PDF</h4>
+                        <p class="text-muted mb-0">Por favor, <strong>no cierres esta pestaña ni el navegador</strong>.
+                        </p>
+                        <p class="small text-secondary">Estamos reuniendo registros y números de serie a exportar...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="modalLoading" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-body text-center p-5">
+                        <div class="spinner-border text-primary mb-4" style="width: 3rem; height: 3rem;" role="status">
+                        </div>
+                        <h4 id="textoModalCarga" class="fw-bold">Cargando</h4>
+                        <p class="text-muted mb-0">Por favor espere <strong></strong>...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalCrearCotizacion" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge info"><i class="bi bi-file-earmark-pdf"></i></div>
+                            Crear Cotización
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formCrearCotizacion" class="row g-3">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2">Encabezado y Cliente</h6>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Fecha Emisión</label>
+                                <input type="date" class="form-control border-0 bg-light" id="regFechaCoti">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Folio</label>
+                                <input type="text" class="form-control bg-light fw-bold text-danger" id="regFolioCoti"
+                                    readonly placeholder="Calculando...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Emisor (PDF)</label>
+                                <select class="form-select border-0 bg-light" id="regEmisorCoti">
+                                    <option value="proseinet">PROSEINET S.A.S. de C.V.</option>
+                                    <option value="dueño">Juan José Arreola Bucio</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Cliente</label>
+                                <input type="text" class="form-control border-0 bg-light" id="regClienteCoti"
+                                    placeholder="Ej. Centro de Convenciones...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" class="form-control border-0 bg-light" id="regTelefonoCoti"
+                                    placeholder="Ej. 4432340049">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Dirección & E-mail</label>
+                                <input type="text" class="form-control border-0 bg-light" id="regEmailCoti"
+                                    placeholder="correo@cliente.com">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo de Cliente</label>
+                                <select class="form-select border-0 bg-light" id="regTipoClienteCoti">
+                                    <option value="publico" selected>Usuario Final</option>
+                                    <option value="mayorista">Mayorista</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-4">Cotización de Equipos o Servicios</h6>
+                            </div>
+                            <div class="col-12 table-responsive">
+                                <table class="table table-hover table-striped mb-0" id="tablaItemsCoti">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%;">Clave</th>
+                                            <th style="width: 50%;">Descripción</th>
+                                            <th style="width: 15%;">Cost U.</th>
+                                            <th style="width: 10%;">Cantidad</th>
+                                            <th style="width: 10%;" class="text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <button type="button" class="btn btn-sm btn-success" id="btnAgregarFilaCoti"><i
+                                        class="fa-solid fa-circle-plus me-2"></i>Agregar</button>
+                                <button type="button" class="btn btn-sm btn-light border ms-2"
+                                    id="btnBuscarModeloCoti"><i class="fa-solid fa-search me-2"></i>Buscar
+                                    Modelo</button>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-4">Politicas Comerciales</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Comentarios</label>
+                                <input type="text" class="form-control border-0 bg-light" id="regMensajeCoti"
+                                    value="*La garantía aplica exclusivamente sobre fallas de hardware atribuibles al funcionamiento propio del equipo, excluyendo daños ocasionados por mal uso, variaciones eléctricas, humedad, golpes, manipulación no autorizada o instalación de componentes ajenos. *Debido a la naturaleza consumible y al desgaste inherente de las baterías, no es posible garantizar su capacidad, autonomía, duración o vida útil remanente, por lo que dichos componentes quedan expresamente excluidos de cualquier cobertura de garantía">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tiempo de Entrega</label>
+                                <input type="text" class="form-control border-0 bg-light" id="regTiempoEntrega">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Método de Pago</label>
+                                <select class="form-select border-0 bg-light" id="regMetodoPago">
+                                    <option value="Por Definir" selected>Por Definir</option>
+                                    <option value="Transferencia">Transferencia</option>
+                                    <option value="Pago con Tarjeta">Pago con Tarjeta</option>
+                                    <option value="Cheque">Cheque</option>
+                                    <option value="Efectivo">Efectivo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Condiciones de Pago</label>
+                                <textarea type="text" class="form-control border-0 bg-light" id="regCondicionesPago"
+                                    rows="1"></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Vigencia de Cotización</label>
+                                <select class="form-select border-0 bg-light" id="regVigenciaCoti">
+                                    <option value="8-dias" selected>8 Días</option>
+                                    <option value="15-dias">15 Días</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tasa de IVA</label>
+                                <div class="mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tasaIvaCoti" id="iva16"
+                                            value="16">
+                                        <label class="form-check-label" for="iva16">16%</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tasaIvaCoti" id="iva8"
+                                            value="8">
+                                        <label class="form-check-label" for="iva8">8%</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tasaIvaCoti" id="iva0"
+                                            value="0" checked>
+                                        <label class="form-check-label" for="iva0">Sin IVA</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Firma (Atentamente)</label>
+                                <textarea class="form-control border-0 bg-light" id="regFirmaCoti"
+                                    rows="2">L.A.E Juan José Arreola Bucio&#10;Director General</textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" id="btnVistaPreviaCotizacion"><i
+                                class="fa-solid fa-eye me-2"></i>Vista Previa</button>
+                        <button type="button" class="btn btn-outline-danger border-0" id="btnLimpiarCotizacion"><i
+                                class="fa-solid fa-trash me-2"></i>Limpiar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btnGenerarPDFCotizacionFinal"><i
+                                class="fa-solid fa-file-export me-2"></i>Exportar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalCrearNotaVenta" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="tituloModalNota">
+                            <div class="modal-icon-badge info"><i class="bi bi-file-earmark-pdf"></i></div>
+                            Crear Nota de Venta
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formCrearNotaVenta" class="row g-3">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2">Encabezado y Cliente</h6>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Fecha Emisión</label>
+                                <input type="date" class="form-control" id="regFechaNota">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Folio</label>
+                                <input type="text" class="form-control bg-light fw-bold text-danger" id="regFolioNota"
+                                    readonly placeholder="Calculando...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Emisor (PDF)</label>
+                                <select class="form-select" id="regEmisorNota">
+                                    <option value="proseinet">PROSEINET S.A.S. de C.V.</option>
+                                    <option value="dueño">Juan José Arreola Bucio</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Cliente</label>
+                                <input type="text" class="form-control" id="regClienteNota"
+                                    placeholder="Ej. Centro de Convenciones...">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" id="regTelefonoNota"
+                                    placeholder="Ej. 4432340049">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Dirección & E-mail</label>
+                                <input type="text" class="form-control" id="regEmailNota"
+                                    placeholder="correo@cliente.com">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo de Cliente</label>
+                                <select class="form-select" id="regTipoClienteNota">
+                                    <option value="publico" selected>Usuario Final</option>
+                                    <option value="mayorista">Mayorista</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 id="lblTituloNotaEquipos" class="text-primary border-bottom pb-2 mt-4">Nota de Venta
+                                    de Equipos o Servicios
+                                </h6>
+                            </div>
+                            <div class="col-12 table-responsive">
+                                <table class="table table-hover table-striped mb-0" id="tablaItemsNota">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%;">Clave</th>
+                                            <th style="width: 50%;">Descripción</th>
+                                            <th style="width: 15%;">Cost U.</th>
+                                            <th style="width: 10%;">Cantidad</th>
+                                            <th style="width: 10%;" class="text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <button type="button" class="btn btn-sm btn-success" id="btnAgregarFilaNota"><i
+                                        class="bi bi-plus-circle me-2"></i>Agregar</button>
+                                <button type="button" class="btn btn-sm btn-light border ms-2"
+                                    id="btnBuscarModeloNota"><i class="fa-solid fa-search me-2"></i>Buscar
+                                    Modelo</button>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-4">Politicas Comerciales</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Comentarios</label>
+                                <input type="text" class="form-control" id="regMensajeNota"
+                                    value="*La garantía aplica exclusivamente sobre fallas de hardware atribuibles al funcionamiento propio del equipo, excluyendo daños ocasionados por mal uso, variaciones eléctricas, humedad, golpes, manipulación no autorizada o instalación de componentes ajenos. *Debido a la naturaleza consumible y al desgaste inherente de las baterías, no es posible garantizar su capacidad, autonomía, duración o vida útil remanente, por lo que dichos componentes quedan expresamente excluidos de cualquier cobertura de garantía">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tiempo de Entrega</label>
+                                <input type="text" class="form-control" id="regTiempoEntregaNota"
+                                    placeholder="Ej: 8 días hábiles">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Método de Pago</label>
+                                <select class="form-select" id="regMetodoPagoNota">
+                                    <option value="Por Definir">Por Definir</option>
+                                    <option value="Transferencia">Transferencia</option>
+                                    <option value="Pago con Tarjeta">Pago con Tarjeta</option>
+                                    <option value="En Efectivo">En Efectivo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Condiciones de Pago</label>
+                                <textarea type="text" class="form-control" id="regCondicionesPagoNota"
+                                    rows="1"></textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Garantía</label>
+                                <select class="form-select" id="regVigenciaNota">
+                                    <option value="1-mes">1 Mes</option>
+                                    <option value="3-meses">3 Meses</option>
+                                    <option value="6-meses">6 Meses</option>
+                                    <option value="12-meses">12 Meses</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tasa de IVA</label>
+                                <div class="mt-2">
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tasaIvaNota" id="iva16Nota"
+                                            value="16">
+                                        <label class="form-check-label" for="iva16Nota">16%</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tasaIvaNota" id="iva8Nota"
+                                            value="8">
+                                        <label class="form-check-label" for="iva8Nota">8%</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="tasaIvaNota" id="iva0Nota"
+                                            value="0" checked>
+                                        <label class="form-check-label" for="iva0Nota">Sin IVA</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Firma (Atentamente)</label>
+                                <textarea class="form-control" id="regFirmaNota"
+                                    rows="2">L.A.E Juan José Arreola Bucio&#10;Director General</textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" id="btnVistaPreviaNota"><i
+                                class="fa-solid fa-eye me-2"></i>Vista Previa</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btnGenerarPDFNotaFinal"><i
+                                class="fa-solid fa-file-export me-2"></i>Exportar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditarFechasMasivo" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge primary"><i class="bi bi-calendar-event"></i></div>
+                            Editar Fechas
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formEditarFechasMasivo" class="row g-3">
+                            <p class="text-muted small">
+                                Se actualizarán las fechas para los <strong id="lblCantSeleccionadosFechas">0</strong>
+                                equipos seleccionados. Marca la casilla de verificación de cada fecha para habilitar su
+                                edición.
+                            </p>
+                            <div class="col-md-12">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="chkActualizarFechaEntrega">
+                                    <label class="form-check-label fw-bold" for="chkActualizarFechaEntrega">
+                                        Actualizar Fecha de Entrega
+                                    </label>
+                                </div>
+                                <input type="date" class="form-control" id="editFechaEntregaMasiva" disabled>
+                            </div>
+                            <div class="col-md-12 mt-3">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="chkActualizarFechaPago">
+                                    <label class="form-check-label fw-bold" for="chkActualizarFechaPago">
+                                        Actualizar Fecha de Pago
+                                    </label>
+                                </div>
+                                <input type="date" class="form-control" id="editFechaPagoMasiva" disabled>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" form="formEditarFechasMasivo" class="btn btn-primary"><i
+                                class="bi bi-save me-2"></i>Guardar
+                            Cambios</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalEditarRegistro" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge success"><i class="bi bi-pencil-square"></i></div>
+                            Editar Registro
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formEditar" class="row g-3">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2">Información General</h6>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Lote</label>
+                                <input type="text" class="form-control bg-light" id="editLot">
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Serie (No editable)</label>
+                                <input type="text" class="form-control bg-light border-success-subtle text-success"
+                                    id="editSerie" readonly>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Categoría</label>
+                                <select class="form-select bg-light" id="editCategoria">
+                                    <option value="LAPTOP">LAPTOP</option>
+                                    <option value="ESCRITORIO">ESCRITORIO</option>
+                                    <option value="MONITOR">MONITOR</option>
+                                    <option value="ALL IN ONE">ALL IN ONE</option>
+                                    <option value="WORKSTATION">WORKSTATION</option>
+                                    <option value="TABLET">TABLET</option>
+                                    <option value="SERVER">SERVER</option>
+                                    <option value="PROYECTORES">PROYECTORES</option>
+                                    <option value="Docking">Docking</option>
+                                    <option value="OTROS">OTROS</option>
+                                    <option value="">SIN CATEGORIA</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Condición</label>
+                                <select class="form-select bg-light" id="editCondicion">
+                                    <option value="NUEVO">NUEVO</option>
+                                    <option value="SEMINUEVO">SEMINUEVO</option>
+                                    <option value="USADO">USADO</option>
+                                    <option value="REFURBISHED">REFURBISHED</option>
+                                    <option value="NO DEFINIDA">NO DEFINIDA</option>
+                                    <option value="REMATE">REMATE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Estatus</label>
+                                <select class="form-select bg-light" id="editEstatus">
+                                    <option value="Almacén">Almacén</option>
+                                    <option value="Proceso">Proceso</option>
+                                    <option value="Por habilitar">Por Habilitar</option>
+                                    <option value="Vendido">Vendido</option>
+                                    <option value="En garantía">En Garantía</option>
+                                    <option value="Falta Pza">Falta Pza</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-2">Logística y Precios</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Cliente Asignado</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control bg-light" id="editCliente"
+                                        placeholder="Ej. Juan Pérez">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Precio Mayorista</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control bg-light" id="editPrecioMayorista"
+                                        placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Precio Público</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control bg-light" id="editPrecioPublico"
+                                        placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Fecha de Pago</label>
+                                <input type="date" class="form-control bg-light" id="editFechaPago">
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Fecha de Entrega</label>
+                                <input type="date" class="form-control bg-light" id="editFechaEntrega">
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label">Tipo de Cliente</label>
+                                <select class="form-select bg-light" id="editTipoClienteNuevo">
+                                    <option value="publico" selected>Usuario Final</option>
+                                    <option value="mayorista">Mayorista</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-2">Hardware Base</h6>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Marca</label>
+                                <input type="text" class="form-control bg-light" id="editMarca">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Modelo</label>
+                                <input type="text" class="form-control bg-light" id="editModelo">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Procesador</label>
+                                <input type="text" class="form-control bg-light" id="editProcesador">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Memoria RAM</label>
+                                <input type="text" class="form-control bg-light" id="editRam">
+                            </div>
+
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Generación (Proc.)</label>
+                                <input type="text" class="form-control bg-light" id="editGeneracion"
+                                    placeholder="Ej. 10ma Gen">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Velocidad (Proc.)</label>
+                                <input type="text" class="form-control bg-light" id="editVelocidad"
+                                    placeholder="Ej. 2.4 GHz">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Tipo de RAM</label>
+                                <input type="text" class="form-control bg-light" id="editTipoRam"
+                                    placeholder="Ej. DDR4">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Video Dedicado</label>
+                                <input type="text" class="form-control bg-light" id="editVideo"
+                                    placeholder="Ej. GTX 1650">
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Descripción de Video</label>
+                                <input type="text" class="form-control bg-light" id="editDescVideo"
+                                    placeholder="Ej. Tarjeta dedicada para diseño">
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mt-2">Almacenamiento y Detalles</h6>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Disco Mecánico</label>
+                                <input type="text" class="form-control bg-light" id="editHdd">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Disco Sólido</label>
+                                <input type="text" class="form-control bg-light" id="editSsd">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Disco Extra</label>
+                                <input type="text" class="form-control bg-light" id="editDiscoExtra"
+                                    placeholder="Ej. 1TB">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Capacidad Extra</label>
+                                <input type="text" class="form-control bg-light" id="editCapacidadExtra"
+                                    placeholder="Ej. 1TB">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Pantalla</label>
+                                <input type="text" class="form-control bg-light" id="editPantalla">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Sistema Operativo</label>
+                                <input type="text" class="form-control bg-light" id="editOs">
+                            </div>
+
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Color</label>
+                                <input type="text" class="form-control bg-light" id="editColor" placeholder="Ej. Plata">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Licencia</label>
+                                <input type="text" class="form-control bg-light" id="editLicencia"
+                                    placeholder="Ej. OEM Original">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Cámara</label>
+                                <input type="text" class="form-control bg-light" id="editCam" placeholder="Sí / No">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">CD/DVD</label>
+                                <input type="text" class="form-control bg-light" id="editCdDvd" placeholder="Sí / No">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Wi-Fi</label>
+                                <input type="text" class="form-control bg-light" id="editWifi" placeholder="Sí / No">
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Bluetooth</label>
+                                <input type="text" class="form-control bg-light" id="editBluetooth"
+                                    placeholder="Sí / No">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Observaciones de Estética</label>
+                                <textarea class="form-control bg-light" id="editEstetica" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Comentarios Generales</label>
+                                <textarea class="form-control bg-light" id="editComentarios" rows="2"></textarea>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" form="formEditar" class="btn btn-success" id="btnEditarEquipo"><i
+                                class="fa-solid fa-floppy-disk me-2"></i>Guardar
+                            Cambios</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalResumenModelos" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-xl modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge success"><i class="fa-solid fa-cubes"></i></div>
+                            Stock en Existencia
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="p-3 bg-light border-bottom d-flex gap-2">
+                        <input type="text" class="form-control" id="buscadorModelos"
+                            placeholder="Buscar por marca, modelo, procesador, RAM o almacenamiento..."><a
+                            id="btnLimpiarBuscadorStock" class="nav-link text-secondary py-2 pe-2"
+                            title="limpiar buscador" onclick="limpiarBuscadorModelos()" style="cursor: pointer;"><i
+                                class="fa-solid fa-xmark"></i></a>
+                        <select class="w-25 form-select form-select-sm bg-light" id="filtroCategoriaStock">
+                            <option value="">Categoría (Todas)</option>
+                            <option value="LAPTOP">Laptop</option>
+                            <option value="ESCRITORIO">Escritorio</option>
+                            <option value="MONITOR">Monitor</option>
+                            <option value="ALL IN ONE">All in One</option>
+                            <option value="WORKSTATION">Workstation</option>
+                            <option value="SERVER">Server</option>
+                            <option value="PROYECTORES">Proyectores</option>
+                            <option value="Docking">Docking</option>
+                            <option value="TABLET">Tablet</option>
+                            <option value="OTROS">Otros</option>
+                        </select>
+                        <select class="w-25 form-select form-select-sm bg-light" id="filtroCondicionStock">
+                            <option value="">Condición (Todas)</option>
+                            <option value="NUEVO">Nuevo</option>
+                            <option value="SEMINUEVO">Seminuevo</option>
+                            <option value="USADO">Usado</option>
+                            <option value="REFURBISHED">Refurbished</option>
+                            <option value="NO DEFINIDA">No definida</option>
+                            <option value="REMATE">Remate</option>
+                        </select>
+                        <button type="button" id="btnOrdenarCategoriaStock"
+                            class="btn btn-outline-secondary border-0 btn-sm text-nowrap d-flex align-items-center gap-1"
+                            title="Ordenar por categoría">
+                            <i class="bi bi-arrow-down-up" id="iconoOrdenCategoriaStock"></i> Categoría
+                        </button>
+                        <button id="btnBuscarStock" class="btn btn-dark"><i class="bi bi-search"></i></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th style="cursor: pointer; user-select: none;" id="thMarcaModeloCategoriaStock"
+                                        title="Clic para ordenar por categoría">
+                                        Marca y Modelo <i class="bi bi-arrow-down-up ms-1 small text-muted"
+                                            id="thIconoOrdenCatStock"></i>
+                                    </th>
+                                    <th>Procesador</th>
+                                    <th class="text-center">RAM</th>
+                                    <th class="text-center">Almacenamiento</th>
+                                    <th class="text-center">Condición</th>
+                                    <th class="text-center">En Stock</th>
+                                    <th class="text-center">Vendidos</th>
+                                    <th class="text-center">Vincular</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTablaModelos">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-success" id="btnExportarStock"><i
+                                class="fa-solid fa-file-import me-2"></i>Exportar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalContenedorRegistros" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge success"><i class="bi bi-boxes"></i></div>
+                            Contenedor de Registros Seleccionados
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th>Serie</th>
+                                    <th>Equipo</th>
+                                    <th>Especificaciones</th>
+                                    <th>Observaciones</th>
+                                    <th>Precio</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTablaContenedor">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <h5 class="me-auto text-dark mb-0">Total Seleccionado: <strong
+                                id="totalContenedor">$0.00</strong></h5>
+                        <button type="button" class="btn btn-light" onclick="vaciarContenedor()"><i
+                                class="fa-solid fa-trash me-2"></i>Vaciar</button>
+                        <button id="btnGenerarCotizacionModal" type="button" class="btn btn-primary"
+                            onclick="contenedorRegistros()" title="Generar Nota de Venta"><i
+                                class="fa-solid fa-file-export me-2"></i>Nota de
+                            Venta</button>
+                        <button class="btn btn-success" type="button" onclick="cambiarEstatusContenedor()"><i
+                                class="fa-solid fa-circle-right me-2"></i>Cambiar Estatus</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalHistorialCotizaciones" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge dark"><i class="bi bi-clock-history"></i></div>
+                            Historial de Cotizaciones Emitidas
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Monto Total</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpoTablaCotizaciones"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalVistaPreviaPDF" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge dark"><i class="fa-solid fa-eye"></i></div>
+                            Vista Previa
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <iframe id="iframeVistaPreviaPDF" style="width: 100%; height: 78vh; border: none;"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modalConfirmacionPersonalizada" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge danger"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <span id="confirmacionTitulo">Atención</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="confirmacionMensaje"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            id="btnConfirmacionCancelar">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btnConfirmacionAceptar">Aceptar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalAbonos" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge success"><i class="fa-solid fa-wallet"></i></div>
+                            Control de Abonos <small class="text-muted px-3" id="clienteTitleAbonos"><span
+                                    class="text-muted" id="modeloTitleAbonos"></span></small>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Total a Pagar</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0">$</span>
+                                    <input type="number" class="form-control bg-light border-0" id="abonoTotalVenta"
+                                        readonly>
+                                    <button class="btn btn-light border-0 dropdown-toggle" type="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                        id="btnAbonoTipoPrecio">Público</button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#"
+                                                onclick="cambiarTipoPrecioAbono('publico')">Precio Público</a></li>
+                                        <li><a class="dropdown-item" href="#"
+                                                onclick="cambiarTipoPrecioAbono('mayorista')">Precio Mayorista</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label text-success">Total Abonado</label>
+                                <div class="input-group">
+                                    <span class="input-group-text icon-badge-input success border-0">$</span>
+                                    <input type="number" class="form-control text-success fw-bold bg-light border-0"
+                                        id="abonoTotalAbonado" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <label class="form-label text-danger">Saldo Restante</label>
+                                <div class="input-group">
+                                    <span class="input-group-text icon-badge-input danger border-0">$</span>
+                                    <input type="number" class="form-control text-danger fw-bold bg-light border-0"
+                                        id="abonoSaldoRestante" readonly>
+                                </div>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <label class="form-label">Nuevo Abono</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0">$</span>
+                                    <input type="number" class="form-control bg-light border-0 border-end"
+                                        id="abonoNuevoMonto" placeholder="Ej. 1500">
+                                    <span class="input-group-text"><i class="fa-solid fa-calendar-plus"></i></span>
+                                    <input type="date" class="form-control bg-light border-0 border-start"
+                                        id="abonoNuevoFecha">
+                                    <button class="btn btn-success border-0" type="button" id="btnRegistrarAbono"
+                                        onclick="registrarAbonoModal()"><i class="fa-solid fa-plus me-1"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <h6 class="text-secondary pb-2"><i class="bi bi-clock-history me-2"></i>Historial de
+                                    Pagos</h6>
+                                <ul class="list-group list-group-sm" id="listaHistorialAbonosModal"
+                                    style="max-height: 250px; overflow-y: auto;"></ul>
+                                <div class="d-flex justify-content-between align-items-center mt-3 px-1">
+                                    <button class="btn btn-sm btn-light border-0" id="btnAbonosAnt"
+                                        onclick="abonosPaginaAnterior()"><i
+                                            class="bi bi-chevron-left me-1"></i>Anteriores</button>
+                                    <span class="small text-muted" id="txtAbonosPagina">Pág. 1</span>
+                                    <button class="btn btn-sm btn-light border-0" id="btnAbonosSig"
+                                        onclick="abonosPaginaSiguiente()">Siguientes<i
+                                            class="bi bi-chevron-right ms-1"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalActaEntrega" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge info"><i class="fa-solid fa-file-signature"></i></div>
+                            Acta de Entrega
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="formActaEntrega" class="row g-3">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2">Datos Generales</h6>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Folio</label>
+                                <input type="text" class="form-control border-0 bg-light" id="actaFolio"
+                                    placeholder="Ej. AE-094-CCXP">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Emisor del Acta (PDF)</label>
+                                <select class="form-select border-0 bg-light" id="regEmisorActa">
+                                    <option value="proseinet">PROSEINET S.A.S. de C.V.</option>
+                                    <option value="dueño">Juan José Arreola Bucio</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Razón Social / Cliente</label>
+                                <input type="text" class="form-control border-0 bg-light" id="actaCliente"
+                                    placeholder="Nombre del cliente">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">RFC del Cliente</label>
+                                <input type="text" class="form-control border-0 bg-light" id="actaRFC"
+                                    placeholder="RFC del Cliente">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Domicilio de Entrega</label>
+                                <input type="text" class="form-control border-0 bg-light" id="actaDomicilio"
+                                    placeholder="Domicilio de entrega">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Contacto (Nombre y Tel/Correo)</label>
+                                <input type="text" class="form-control border-0 bg-light" id="actaContacto"
+                                    placeholder="Nombre de Contacto y Tel/Correo">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Cotización / Factura (Referencia)</label>
+                                <input type="text" class="form-control border-0 bg-light" id="actaReferencia"
+                                    placeholder="Cotización / Factura (Referencia)">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tiempo de Garantía</label>
+                                <input type="text" class="form-control border-0 bg-light" id="actaGarantia"
+                                    placeholder="Ej. 3 a 12 meses" value="3 a 12 meses">
+                            </div>
+                            <div class="col-12 mt-3">
+                                <h6 class="text-primary border-bottom pb-2">Equipos o Servicios a Entregar</h6>
+                            </div>
+                            <div class="col-12 table-responsive">
+                                <table class="table table-hover table-striped mb-0" id="tablaEquiposActa">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 12%;">Tipo</th>
+                                            <th style="width: 12%;">Marca</th>
+                                            <th style="width: 15%;">Modelo</th>
+                                            <th style="width: 15%;">Serie / Asset</th>
+                                            <th style="width: 26%;">Especificaciones</th>
+                                            <th style="width: 12%;">Condición</th>
+                                            <th style="width: 8%;" class="text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cuerpoTablaEquiposActa"></tbody>
+                                </table>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-sm btn-success" id="btnAgregarFilaActa">
+                                        <i class="fa-solid fa-circle-plus me-2"></i>Agregar Equipo / Servicio
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-light border ms-2"
+                                        id="btnBuscarModeloActa">
+                                        <i class="fa-solid fa-search me-2"></i>Buscar en Almacén
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" id="btnVistaPreviaActa"><i
+                                class="fa-solid fa-eye me-2"></i>Vista Previa</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="btnDescargarActaPDF"><i
+                                class="fa-solid fa-download me-2"></i>Descargar PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="modalPerfilInfo" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <div class="modal-icon-badge success"><i class="fa-solid fa-user"></i></div>
+                            Información del Perfil
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Nombre de Usuario: </h6>
+                        <p class="border-bottom pb-2" id="txtNombrePerfil"></p>
+                        <h6>Email</h6>
+                        <p class="border-bottom pb-2" id="txtEmailPerfil"></p>
+                        <h6>Rol de Usuario</h6>
+                        <p class="border-bottom pb-2" id="txtRolPerfil"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+</body>
+
+</html>

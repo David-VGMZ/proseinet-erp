@@ -1,0 +1,26 @@
+<div id="login-screen" class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%; border-radius: 15px;">
+        <div class="text-center mb-4">
+            <img src="/img/Logo-proseinet-rojo.png" alt="Proseinet Logo" width="120">
+            <h4 class="mt-3 fw-bold">Acceso al Sistema</h4>
+        </div>
+        <form id="login-form">
+            <div class="mb-3">
+                <input type="email" id="login-email" class="form-control border-0 border-bottom" required
+                    placeholder="Correo Electrónico">
+            </div>
+            <div class="mb-3">
+                <div class="input-group">
+                    <input type="password" id="login-pass" class="form-control border-0 border-bottom" required
+                        placeholder="Contraseña">
+                    <button class="btn btn-outline-secondary border-0 border-bottom" type="button" id="toggle-password"
+                        title="Mostrar/Ocultar contraseña">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" id="btnEntrar" class="btn btn-danger w-100 py-2 fw-bold">Entrar</button>
+        </form>
+        <div id="login-error" class="text-danger small mt-3 text-center" style="display: none;"></div>
+    </div>
+</div>
