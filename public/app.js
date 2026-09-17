@@ -6557,7 +6557,7 @@ window.renderizarTablaModelos = (filtro) => {
                     <td class="text-center"><span class="badge bg-success-subtle text-success fs-6">${item.existencia}</span></td>
                     <td class="text-center"><span class="badge bg-primary-subtle text-primary">${item.vendidos}</span></td>
                     <td class="text-center">
-                        <button class="btn-vincular btn btn-sm btn-light text-secondary shadow-sm rounded-pill" onclick="vincularGrupoCatalogo('${item.llave}')" title="'Vincular a Tienda'}">
+                        <button class="btn-vincular btn btn-sm btn-light text-secondary shadow-sm rounded-pill" onclick="vincularGrupoCatalogo('${item.llave}')" title="Vincular a Tienda">
                             <i class="fa-solid fa-link"></i>
                         </button>
                     </td>
