@@ -11,14 +11,14 @@
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="apple-touch-icon" href="/img/Logo-proseinet-rojo.png" />
     <link rel="icon" href="/img/Logo-proseinet-rojo.png" />
-    <link rel="stylesheet" href="/css/app.css?=0.620">
+    <link rel="stylesheet" href="/css/app.css?=0.656">
 </head>
 
 <body>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
-    <script type="module" src="/app.js?=1.706"></script>
+    <script type="module" src="/app.js?=1.722"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -55,7 +55,7 @@
                 <div class="d-flex align-items-center justify-content-between mb-3 brand-section">
                     <div></div>
                     <img id="sidebarLogo" onclick="scrollToTop()" src="/img/Proseinet-Logo-Web.png" alt="proseinet-logo"
-                        width="100" style="cursor: pointer; transition: all 0.3s ease;">
+                        width="100" style="cursor: pointer; transition: opacity 0.25s ease, width 0.25s cubic-bezier(0.4, 0, 0.2, 1);">
                     <div class="d-md-none d-block"></div>
                     <button id="btnToggleSidebar" class="btn text-white p-1 border-0"
                         style="background: transparent; font-size: 1.25rem;">
@@ -97,26 +97,26 @@
                         </a>
 
                         <div class="collapse" id="submenuDocumentos">
-                            <ul class="nav flex-column ms-3 mt-1" style="font-size: 0.95em;">
+                            <ul class="nav flex-column ms-3 mt-1">
                                 <li class="nav-item">
-                                    <a class="nav-link" style="cursor: pointer;" href="#"
+                                    <a class="nav-link" style="cursor: pointer; font-size: 0.75rem;" href="#"
                                         onclick="abrirCotizacionManual()">
                                         <i class="fa-solid fa-file-invoice me-2"></i>Nueva Cotización
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" style="cursor: pointer;" href="#" id="btnExportarNota">
+                                    <a class="nav-link" style="cursor: pointer; font-size: 0.75rem;" href="#" id="btnExportarNota">
                                         <i class="fa-solid fa-receipt me-2"></i>Nueva Nota de Venta
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" style="cursor: pointer;" href="#"
+                                    <a class="nav-link" style="cursor: pointer; font-size: 0.75rem;" href="#"
                                         onclick="abrirHistorialCotizaciones()">
                                         <i class="fa-solid fa-clock-rotate-left me-2"></i>Historial de Docs
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" style="cursor: pointer;" href="#"
+                                    <a class="nav-link" style="cursor: pointer; font-size: 0.75rem;" href="#"
                                         onclick="generarActaEquiposSeleccionados()">
                                         <i class="fa-solid fa-file-signature me-2"></i>Acta de Entrega
                                     </a>
@@ -1372,7 +1372,7 @@
                         </button>
                         <button id="btnBuscarStock" class="btn btn-dark"><i class="bi bi-search"></i></button>
                     </div>
-                    <div class="modal-body p-0">
+                    <div class="modal-body p-0" style="padding: 0 24px !important;">
                         <table class="table table-hover table-striped mb-0">
                             <thead class="sticky-top">
                                 <tr>
@@ -1439,7 +1439,6 @@
                             Venta</button>
                         <button class="btn btn-success" type="button" onclick="cambiarEstatusContenedor()"><i
                                 class="fa-solid fa-circle-right me-2"></i>Cambiar Estatus</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     </div>
                 </div>
             </div>
@@ -1450,18 +1449,18 @@
                     <div class="modal-header">
                         <h5 class="modal-title">
                             <div class="modal-icon-badge dark"><i class="bi bi-clock-history"></i></div>
-                            Historial de Cotizaciones Emitidas
+                            Historial de Documentos
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body" style="padding: 0 24px !important;">
                         <table class="table table-hover table-striped mb-0">
                             <thead class="sticky-top">
                                 <tr>
                                     <th>Folio</th>
                                     <th>Fecha</th>
                                     <th>Cliente</th>
-                                    <th>Monto Total</th>
+                                    <th>Monto / # Equipos</th>
                                     <th class="text-center">Acciones</th>
                                 </tr>
                             </thead>
@@ -1596,7 +1595,7 @@
                     <div class="modal-header">
                         <h5 class="modal-title">
                             <div class="modal-icon-badge info"><i class="fa-solid fa-file-signature"></i></div>
-                            Acta de Entrega
+                            <span id="tituloModalActa">Acta de Entrega</span>
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>

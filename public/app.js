@@ -759,8 +759,8 @@ window.cambiarEstatusSeleccionados = async () => {
     let tipoPrecio = null;
     if (mostrarPromptTipoPrecio) {
         const tipoPrecioResult = await Swal.fire({
-            title: "Tipo de Precio",
-            text: "¿Qué tipo de precio aplica para estos productos?",
+            title: "Tipo de Precio / Cliente",
+            text: "¿Qué tipo de precio/cliente aplica para estos productos?",
             input: "select",
             inputOptions: {
                 "publico": "Precio Público",
@@ -779,31 +779,6 @@ window.cambiarEstatusSeleccionados = async () => {
 
         tipoPrecio = tipoPrecioResult.isConfirmed ? tipoPrecioResult.value : null;
         if (!tipoPrecio) return;
-    }
-
-    let tipoCliente = null;
-    if (estatusLower === 'proceso' || estatusLower === 'vendido') {
-        const tipoClienteResult = await Swal.fire({
-            title: "Tipo de Cliente",
-            text: "¿Qué tipo de cliente aplica para estos productos? Confirma la indicación correcta:",
-            input: "select",
-            inputOptions: {
-                "publico": "Usuario Final",
-                "mayorista": "Mayorista"
-            },
-            inputPlaceholder: "Selecciona el tipo de cliente",
-            showCancelButton: true,
-            confirmButtonText: "Aceptar",
-            cancelButtonText: "Cancelar",
-            inputValidator: (value) => {
-                if (!value) {
-                    return "Debes seleccionar el tipo de cliente";
-                }
-            }
-        });
-
-        tipoCliente = tipoClienteResult.isConfirmed ? tipoClienteResult.value : null;
-        if (!tipoCliente) return;
     }
 
     try {
@@ -856,7 +831,7 @@ window.cambiarEstatusSeleccionados = async () => {
                 if (estatusLower === 'proceso' || estatusLower === 'vendido') {
                     const itemTieneTipoPrecio = itemActual.tipoPrecioAbono && String(itemActual.tipoPrecioAbono).trim() !== '';
                     dataActualizacion.tipoPrecioAbono = itemTieneTipoPrecio ? String(itemActual.tipoPrecioAbono).trim() : (tipoPrecio || '').trim();
-                    dataActualizacion.tipoCliente = tipoCliente || '';
+                    dataActualizacion.tipoCliente = itemTieneTipoPrecio ? String(itemActual.tipoPrecioAbono).trim() : (tipoPrecio || '').trim();
                 }
 
                 const nuevoHistorial = window.procesarTransicionGarantia(itemActual, nuevoEstatus.trim(), fechaMov, "Cambio de estatus masivo", comentariosFinal);
@@ -2116,8 +2091,8 @@ window.cambiarEstatusRapido = async (serie, nuevoEstatus, fechaEntregaActual = '
 
         if (estatusLower === 'proceso' || estatusLower === 'vendido') {
             const tipoPrecioResult = await Swal.fire({
-                title: "Tipo de Precio",
-                text: "¿Qué tipo de precio aplica para este producto?",
+                title: "Tipo de Precio / Cliente",
+                text: `¿Qué tipo de precio/cliente aplica para el equipo ${serie}?`,
                 input: "select",
                 inputOptions: {
                     "publico": "Precio Público",
@@ -2138,30 +2113,6 @@ window.cambiarEstatusRapido = async (serie, nuevoEstatus, fechaEntregaActual = '
             if (!tipoPrecio) return;
         }
 
-        let tipoCliente = null;
-        if (estatusLower === 'proceso' || estatusLower === 'vendido') {
-            const tipoClienteResult = await Swal.fire({
-                title: "Tipo de Cliente",
-                text: `¿Qué tipo de cliente aplica para el equipo ${serie}? Confirma la indicación correcta:`,
-                input: "select",
-                inputOptions: {
-                    "publico": "Usuario Final",
-                    "mayorista": "Mayorista"
-                },
-                inputPlaceholder: "Selecciona el tipo de cliente",
-                showCancelButton: true,
-                confirmButtonText: "Aceptar",
-                cancelButtonText: "Cancelar",
-                inputValidator: (value) => {
-                    if (!value) {
-                        return "Debes seleccionar el tipo de cliente";
-                    }
-                }
-            });
-            tipoCliente = tipoClienteResult.isConfirmed ? tipoClienteResult.value : null;
-            if (!tipoCliente) return;
-        }
-
         modalLoading.show();
 
         const docRef = doc(db, 'almacen', serie);
@@ -2176,7 +2127,7 @@ window.cambiarEstatusRapido = async (serie, nuevoEstatus, fechaEntregaActual = '
         };
         if (estatusLower === 'proceso' || estatusLower === 'vendido') {
             dataActualizacion.tipoPrecioAbono = tipoPrecio;
-            dataActualizacion.tipoCliente = tipoCliente || '';
+            dataActualizacion.tipoCliente = tipoPrecio || '';
         }
 
         if (requiereMotivo) {
@@ -5343,6 +5294,7 @@ if (modalVistaPreviaPDFEl) {
             URL.revokeObjectURL(activePreviewBlobUrl);
             activePreviewBlobUrl = null;
         }
+        window.evitarResetModal = false;
 
         if (window.lastModalOpen === 'nota') {
             bootstrap.Modal.getInstance(document.getElementById('modalCrearNotaVenta')).show();
@@ -7376,8 +7328,8 @@ window.cambiarEstatusContenedor = async () => {
     let tipoPrecio = null;
     if (mostrarPromptTipoPrecio) {
         const tipoPrecioResult = await Swal.fire({
-            title: "Tipo de Precio",
-            text: "¿Qué tipo de precio aplica para estos productos?",
+            title: "Tipo de Precio / Cliente",
+            text: "¿Qué tipo de precio/cliente aplica para estos productos?",
             input: "select",
             inputOptions: {
                 "publico": "Precio Público",
@@ -7396,31 +7348,6 @@ window.cambiarEstatusContenedor = async () => {
 
         tipoPrecio = tipoPrecioResult.isConfirmed ? tipoPrecioResult.value : null;
         if (!tipoPrecio) return;
-    }
-
-    let tipoCliente = null;
-    if (estatusLower === 'proceso' || estatusLower === 'vendido') {
-        const tipoClienteResult = await Swal.fire({
-            title: "Tipo de Cliente",
-            text: "¿Qué tipo de cliente aplica para estos productos? Confirma la indicación correcta:",
-            input: "select",
-            inputOptions: {
-                "publico": "Usuario Final",
-                "mayorista": "Mayorista"
-            },
-            inputPlaceholder: "Selecciona el tipo de cliente",
-            showCancelButton: true,
-            confirmButtonText: "Aceptar",
-            cancelButtonText: "Cancelar",
-            inputValidator: (value) => {
-                if (!value) {
-                    return "Debes seleccionar el tipo de cliente";
-                }
-            }
-        });
-
-        tipoCliente = tipoClienteResult.isConfirmed ? tipoClienteResult.value : null;
-        if (!tipoCliente) return;
     }
 
     try {
@@ -7472,7 +7399,7 @@ window.cambiarEstatusContenedor = async () => {
                 if (estatusLower === 'proceso' || estatusLower === 'vendido') {
                     const itemTieneTipoPrecio = itemActual.tipoPrecioAbono && String(itemActual.tipoPrecioAbono).trim() !== '';
                     dataActualizacion.tipoPrecioAbono = itemTieneTipoPrecio ? String(itemActual.tipoPrecioAbono).trim() : (tipoPrecio || '').trim();
-                    dataActualizacion.tipoCliente = tipoCliente || '';
+                    dataActualizacion.tipoCliente = itemTieneTipoPrecio ? String(itemActual.tipoPrecioAbono).trim() : (tipoPrecio || '').trim();
                 }
 
                 const nuevoHistorial = window.procesarTransicionGarantia(itemActual, estatusTrim, fechaParseada, dataActualizacion.ultimoMovimiento, comentariosFinal);
@@ -7742,25 +7669,42 @@ window.abrirHistorialCotizaciones = async () => {
         tbody.innerHTML = '';
 
         if (snap.empty) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aún no hay cotizaciones o notas guardadas en el historial.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Aún no hay documentos guardados en el historial.</td></tr>';
         } else {
             snap.forEach(docSnap => {
                 const d = docSnap.data();
-                const fecha = d.fecha ? new Date(d.fecha + "T00:00:00").toLocaleDateString('es-MX') : 'N/A';
-                const total = `$${Number(d.totalGlobal).toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
-                const badgeTipo = d.tipo === 'nota' ? '<span class="badge bg-success-subtle border-success-subtle text-success ms-1">Nota</span>' : '<span class="badge bg-light text-secondary border ms-1">Coti</span>';
+                const esActa = d.tipo === 'acta';
+                const esNota = d.tipo === 'nota';
+                const fecha = esActa
+                    ? (d.fechaISO ? new Date(d.fechaISO + "T00:00:00").toLocaleDateString('es-MX') : (d.fecha || 'N/A'))
+                    : (d.fecha ? new Date(d.fecha + "T00:00:00").toLocaleDateString('es-MX') : 'N/A');
+                const total = esActa
+                    ? `${(d.items || []).length} equipo(s)`
+                    : `$${Number(d.totalGlobal).toLocaleString("es-MX", { minimumFractionDigits: 2 })}`;
+                const badgeTipo = esActa
+                    ? '<span class="badge bg-danger-subtle border-danger-subtle text-danger ms-1">Acta</span>'
+                    : (esNota ? '<span class="badge bg-success-subtle border-success-subtle text-success ms-1">Nota</span>' : '<span class="badge bg-light text-secondary border ms-1">Coti</span>');
+                let acciones = '';
+                if (esActa) {
+                    acciones = `
+                            <button class="btn btn-sm btn-outline-secondary border-0 ms-1" onclick="editarActa('${d.folio}', false)" title="Editar"><i class="fa-solid fa-file-pen"></i></button>
+                            <button class="btn btn-sm btn-outline-dark border-0 ms-1" onclick="reconstruirActa('${d.folio}')" title="Reconstruir"><i class="fa-solid fa-file-circle-plus"></i></button>
+                            <button class="btn btn-sm btn-outline-danger border-0 ms-1" onclick="descargarPDFActaDirecto('${d.folio}', false)" title="Descargar PDF"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button class="btn btn-sm btn-outline-dark border-0 ms-1" onclick="descargarPDFActaDirecto('${d.folio}', true)" title="Vista Previa"><i class="fa-solid fa-eye"></i></button>`;
+                } else {
+                    acciones = `
+                            <button class="btn btn-sm btn-outline-secondary border-0 ms-1" onclick="editarCotizacion('${d.folio}', false)" title="Editar"><i class="fa-solid fa-file-pen"></i></button>
+                            <button class="btn btn-sm btn-outline-dark border-0 ms-1" onclick="reconstruirCotizacion('${d.folio}')" title="Reconstruir"><i class="fa-solid fa-file-circle-plus"></i></button>
+                            <button class="btn btn-sm btn-outline-danger border-0 ms-1" onclick="descargarPDFCotizacionDirecto('${d.folio}', false)" title="Descargar PDF"><i class="fa-solid fa-file-pdf"></i></button>
+                            <button class="btn btn-sm btn-outline-dark border-0 ms-1" onclick="descargarPDFCotizacionDirecto('${d.folio}', true)" title="Vista Previa"><i class="fa-solid fa-eye"></i></button>`;
+                }
                 tbody.innerHTML += `
                     <tr>
                         <td><span class="badge bg-danger-subtle border-danger-subtle text-danger">${d.folio}</span>${badgeTipo}</td>
                         <td>${fecha}</td>
                         <td class="fw-bold text-secondary">${d.cliente || 'Sin cliente especificado'}</td>
                         <td>${total}</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-secondary border-0 ms-1" onclick="editarCotizacion('${d.folio}', false)" title="Editar"><i class="fa-solid fa-file-pen"></i></button>
-                            <button class="btn btn-sm btn-outline-dark border-0 ms-1" onclick="reconstruirCotizacion('${d.folio}')" title="Reconstruir"><i class="fa-solid fa-file-circle-plus"></i></button>
-                            <button class="btn btn-sm btn-outline-danger border-0 ms-1" onclick="descargarPDFCotizacionDirecto('${d.folio}', false)" title="Descargar PDF"><i class="fa-solid fa-file-pdf"></i></button>
-                            <button class="btn btn-sm btn-outline-dark border-0 ms-1" onclick="descargarPDFCotizacionDirecto('${d.folio}', true)" title="Vista Previa"><i class="fa-solid fa-eye"></i></button>
-                        </td>
+                        <td class="text-center">${acciones}</td>
                     </tr>
                 `;
             });
@@ -8512,32 +8456,26 @@ function confirmarAccion(titulo, mensaje, textoBotonAceptar, textoBotonCancelar)
     const btnToggleSidebar = document.getElementById('btnToggleSidebar');
     const toggleIcon = document.getElementById('toggleIcon');
 
-    const updateSidebarIcon = (isCollapsed) => {
+    const setIconCollapsed = (collapsed) => {
         if (toggleIcon) {
-            if (isCollapsed) {
-                toggleIcon.classList.remove('bi-chevron-left');
-                toggleIcon.classList.add('bi-chevron-right');
-            } else {
-                toggleIcon.classList.remove('bi-chevron-right');
-                toggleIcon.classList.add('bi-chevron-left');
-            }
+            toggleIcon.style.display = 'inline-block';
+            toggleIcon.style.transform = collapsed ? 'rotate(180deg)' : 'rotate(0deg)';
         }
     };
 
     const sidebarState = localStorage.getItem('sidebar_collapsed');
-    if (sidebarState === 'true') {
+    const isCollapsedInit = sidebarState === 'true';
+    if (isCollapsedInit) {
         document.body.classList.add('sidebar-collapsed');
-        updateSidebarIcon(true);
-    } else {
-        updateSidebarIcon(false);
     }
+    setIconCollapsed(isCollapsedInit);
 
     if (btnToggleSidebar) {
         btnToggleSidebar.addEventListener('click', () => {
             const isCollapsing = !document.body.classList.contains('sidebar-collapsed');
             document.body.classList.toggle('sidebar-collapsed', isCollapsing);
             localStorage.setItem('sidebar_collapsed', isCollapsing);
-            updateSidebarIcon(isCollapsing);
+            setIconCollapsed(isCollapsing);
 
             if (isCollapsing) {
                 const collapseDocs = document.getElementById('submenuDocumentos');
@@ -8886,7 +8824,7 @@ window.generarPDFActaEntrega = async (datosGenerales, equipos) => {
         compress: true
     });
 
-    const emisorSeleccionado = document.getElementById('regEmisorActa').value;
+    const emisorSeleccionado = (datosGenerales && datosGenerales.emisor) ? datosGenerales.emisor : document.getElementById('regEmisorActa').value;
 
     const logo = new Image();
     logo.src = '/img/PROSEINET-LOGO-PDFs.png';
@@ -9236,6 +9174,7 @@ if (btnBuscarModeloActa) {
 }
 
 window.generarActaEquiposSeleccionados = async () => {
+    window.ultimoOrigenModal = null;
     if (typeof window.cerrarDropdownAcciones === 'function') {
         window.cerrarDropdownAcciones();
     }
@@ -9291,6 +9230,14 @@ window.generarActaEquiposSeleccionados = async () => {
 };
 
 window._extraerDatosActa = () => {
+    const modalA = document.getElementById('modalActaEntrega');
+    const esEdicionActa = modalA && modalA.getAttribute('data-modo') === 'editar';
+    const fechaISO = esEdicionActa && modalA.getAttribute('data-fecha-original')
+        ? modalA.getAttribute('data-fecha-original')
+        : new Date().toISOString().split('T')[0];
+    const fecha = esEdicionActa && modalA.getAttribute('data-fecha-texto-original')
+        ? modalA.getAttribute('data-fecha-texto-original')
+        : new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' });
     return {
         folio: document.getElementById('actaFolio').value.trim(),
         emisor: document.getElementById('regEmisorActa').value.trim(),
@@ -9300,7 +9247,8 @@ window._extraerDatosActa = () => {
         contacto: document.getElementById('actaContacto').value.trim(),
         referencia: document.getElementById('actaReferencia').value.trim(),
         tiempoGarantia: document.getElementById('actaGarantia').value.trim(),
-        fecha: new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+        fechaISO,
+        fecha
     };
 };
 
@@ -9331,6 +9279,113 @@ window._extraerEquiposActa = () => {
     return equipos;
 };
 
+window._guardarActaEnHistorial = async (formValues, equiposActa) => {
+    try {
+        const folioRef = doc(db, "cotizaciones", formValues.folio);
+        const folioSnap = await getDoc(folioRef);
+        let folioNum = folioSnap.exists() ? (folioSnap.data().folioNum || 900) : null;
+        if (!folioNum) {
+            const q = query(collection(db, "cotizaciones"), orderBy("folioNum", "desc"), limit(1));
+            const snap = await getDocs(q);
+            folioNum = snap.empty ? 900 : (snap.docs[0].data().folioNum + 1);
+        }
+        const actaData = {
+            tipo: 'acta',
+            folio: formValues.folio,
+            folioNum,
+            fechaISO: formValues.fechaISO,
+            fecha: formValues.fecha,
+            emisor: formValues.emisor,
+            cliente: formValues.cliente,
+            rfc: formValues.rfc,
+            domicilio: formValues.domicilio,
+            contacto: formValues.contacto,
+            referencia: formValues.referencia,
+            tiempoGarantia: formValues.tiempoGarantia,
+            items: equiposActa,
+            ultimaEdicion: new Date()
+        };
+        await setDoc(folioRef, actaData);
+        return true;
+    } catch (err) {
+        console.error("Error guardando acta en la BD:", err);
+        return false;
+    }
+};
+
+window.descargarPDFActaDirecto = async (folio, soloPrevisualizar = false) => {
+    if (typeof modalLoading !== 'undefined') modalLoading.show();
+    try {
+        const docRef = doc(db, "cotizaciones", folio);
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) {
+            await Swal.fire({
+                title: "No Encontrado",
+                text: "El registro solicitado no existe.",
+                icon: "error"
+            });
+            if (typeof modalLoading !== 'undefined') modalLoading.hide();
+            return;
+        }
+
+        const d = snap.data();
+        const datosGenerales = {
+            folio: d.folio,
+            emisor: d.emisor || 'proseinet',
+            fecha: d.fechaISO
+                ? new Date(d.fechaISO + "T00:00:00").toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })
+                : (d.fecha || ''),
+            cliente: d.cliente || '',
+            rfc: d.rfc || '',
+            domicilio: d.domicilio || '',
+            contacto: d.contacto || '',
+            referencia: d.referencia || '',
+            tiempoGarantia: d.tiempoGarantia || '3 a 12 meses'
+        };
+        const equiposActa = (d.items || []).map(eq => ({
+            ...eq,
+            especificaciones: eq.especificaciones || ''
+        }));
+
+        if (document.getElementById('regEmisorActa')) {
+            document.getElementById('regEmisorActa').value = datosGenerales.emisor;
+        }
+
+        const pdfActa = await window.generarPDFActaEntrega(datosGenerales, equiposActa);
+
+        if (soloPrevisualizar) {
+            const blob = pdfActa.output('blob');
+            if (activePreviewBlobUrl) {
+                URL.revokeObjectURL(activePreviewBlobUrl);
+            }
+            activePreviewBlobUrl = URL.createObjectURL(blob);
+            document.getElementById('iframeVistaPreviaPDF').src = activePreviewBlobUrl;
+
+            window.lastModalOpen = 'historial';
+            window.evitarResetModal = true;
+
+            const modalHistorialEl = document.getElementById('modalHistorialCotizaciones');
+            if (modalHistorialEl) {
+                const inst = bootstrap.Modal.getInstance(modalHistorialEl);
+                if (inst) inst.hide();
+            }
+            modalVistaPreviaPDF.show();
+        } else {
+            pdfActa.save(`Acta_Entrega_${d.folio}_${(d.cliente || 'General').replace(/\s+/g, '_')}.pdf`);
+        }
+
+        if (typeof modalLoading !== 'undefined') modalLoading.hide();
+    } catch (error) {
+        if (typeof modalLoading !== 'undefined') modalLoading.hide();
+        console.error("Error generando acta desde historial:", error);
+        await Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error al generar el PDF del Acta de Entrega.",
+            icon: "error"
+        });
+    }
+};
+
 const btnDescargarActaPDF = document.getElementById('btnDescargarActaPDF');
 if (btnDescargarActaPDF) {
     btnDescargarActaPDF.addEventListener('click', async () => {
@@ -9346,6 +9401,8 @@ if (btnDescargarActaPDF) {
 
             const pdfActa = await window.generarPDFActaEntrega(formValues, equiposActa);
             pdfActa.save(`Acta_Entrega_${formValues.folio}_${(formValues.cliente || 'General').replace(/\s+/g, '_')}.pdf`);
+
+            await window._guardarActaEnHistorial(formValues, equiposActa);
 
             if (typeof modalLoading !== 'undefined') modalLoading.hide();
 
@@ -9379,20 +9436,25 @@ if (btnVistaPreviaActa) {
             const pdfActa = await window.generarPDFActaEntrega(formValues, equiposActa);
             const blob = pdfActa.output('blob');
 
-            if (window.activePreviewBlobUrl) {
-                URL.revokeObjectURL(window.activePreviewBlobUrl);
+            await window._guardarActaEnHistorial(formValues, equiposActa);
+
+            if (activePreviewBlobUrl) {
+                URL.revokeObjectURL(activePreviewBlobUrl);
             }
 
-            window.activePreviewBlobUrl = URL.createObjectURL(blob);
-            document.getElementById('iframeVistaPreviaPDF').src = window.activePreviewBlobUrl;
+            activePreviewBlobUrl = URL.createObjectURL(blob);
+            document.getElementById('iframeVistaPreviaPDF').src = activePreviewBlobUrl;
 
             if (typeof modalLoading !== 'undefined') modalLoading.hide();
 
-            bootstrap.Modal.getInstance(document.getElementById('modalActaEntrega')).hide();
-
             window.lastModalOpen = 'acta';
-            const modalVistaPrevia = new bootstrap.Modal(document.getElementById('modalVistaPreviaPDF'));
-            modalVistaPrevia.show();
+            window.evitarResetModal = true;
+            const actaModalEl = document.getElementById('modalActaEntrega');
+            if (actaModalEl) {
+                const inst = bootstrap.Modal.getInstance(actaModalEl);
+                if (inst) inst.hide();
+            }
+            modalVistaPreviaPDF.show();
 
         } catch (error) {
             if (typeof modalLoading !== 'undefined') modalLoading.hide();
@@ -9401,6 +9463,129 @@ if (btnVistaPreviaActa) {
         }
     });
 }
+
+const modalActaEntregaEl = document.getElementById('modalActaEntrega');
+if (modalActaEntregaEl) {
+    modalActaEntregaEl.addEventListener('hidden.bs.modal', () => {
+        if (window.evitarResetModal) {
+            window.evitarResetModal = false;
+            return;
+        }
+
+        modalActaEntregaEl.removeAttribute('data-modo');
+        modalActaEntregaEl.removeAttribute('data-folio-original');
+        modalActaEntregaEl.removeAttribute('data-folio-num-original');
+        modalActaEntregaEl.removeAttribute('data-fecha-original');
+        modalActaEntregaEl.removeAttribute('data-fecha-texto-original');
+
+        const tituloModalActa = document.getElementById('tituloModalActa');
+        if (tituloModalActa) {
+            tituloModalActa.innerText = 'Acta de Entrega';
+        }
+
+        if (window.ultimoOrigenModal === 'historial') {
+            window.ultimoOrigenModal = null;
+            setTimeout(() => {
+                new bootstrap.Modal(document.getElementById('modalHistorialCotizaciones')).show();
+            }, 300);
+        }
+    });
+}
+
+window.editarActa = async (folio, esDuplicado = false) => {
+    window.ultimoOrigenModal = 'historial';
+    if (typeof modalLoading !== 'undefined') modalLoading.show();
+    try {
+        const docRef = doc(db, "cotizaciones", folio);
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) {
+            await Swal.fire({
+                title: "No Encontrado",
+                text: "El registro solicitado no existe.",
+                icon: "error"
+            });
+            if (typeof modalLoading !== 'undefined') modalLoading.hide();
+            return;
+        }
+        const d = snap.data();
+
+        document.getElementById('actaFolio').value = d.folio || '';
+        document.getElementById('regEmisorActa').value = d.emisor || 'proseinet';
+        document.getElementById('actaCliente').value = d.cliente || '';
+        document.getElementById('actaRFC').value = d.rfc || '';
+        document.getElementById('actaDomicilio').value = d.domicilio || '';
+        document.getElementById('actaContacto').value = d.contacto || '';
+        document.getElementById('actaReferencia').value = d.referencia || '';
+        document.getElementById('actaGarantia').value = d.tiempoGarantia || '3 a 12 meses';
+
+        const tbody = document.getElementById('cuerpoTablaEquiposActa');
+        tbody.innerHTML = '';
+        if ((d.items || []).length > 0) {
+            d.items.forEach(eq => {
+                agregarFilaActa(
+                    eq.categoria || eq.tipo || '',
+                    eq.marca || '',
+                    eq.modelo || '',
+                    eq.serie || '',
+                    eq.especificaciones || '',
+                    eq.condicion || eq.estatus || 'REFURBISHED'
+                );
+            });
+        } else {
+            agregarFilaActa();
+        }
+
+        const modalEl = document.getElementById('modalActaEntrega');
+        const tituloModalActa = document.getElementById('tituloModalActa');
+
+        if (esDuplicado) {
+            const q = query(collection(db, "cotizaciones"), orderBy("folioNum", "desc"), limit(1));
+            const snapList = await getDocs(q);
+            let nextFolioNum = 1;
+            if (!snapList.empty) {
+                nextFolioNum = snapList.docs[0].data().folioNum + 1;
+            }
+            document.getElementById('actaFolio').value = `AE-${String(nextFolioNum).padStart(3, '0')}-${new Date().getFullYear()}`;
+
+            if (modalEl) {
+                modalEl.removeAttribute('data-modo');
+                modalEl.removeAttribute('data-folio-original');
+                modalEl.removeAttribute('data-folio-num-original');
+                modalEl.removeAttribute('data-fecha-original');
+                modalEl.removeAttribute('data-fecha-texto-original');
+            }
+            if (tituloModalActa) {
+                tituloModalActa.innerText = 'Reconstruir Acta de Entrega';
+            }
+        } else {
+            if (modalEl) {
+                modalEl.setAttribute('data-modo', 'editar');
+                modalEl.setAttribute('data-folio-original', folio);
+                modalEl.setAttribute('data-folio-num-original', d.folioNum || 1);
+                modalEl.setAttribute('data-fecha-original', d.fechaISO || '');
+                modalEl.setAttribute('data-fecha-texto-original', d.fecha || '');
+            }
+            if (tituloModalActa) {
+                tituloModalActa.innerText = 'Editar Acta de Entrega';
+            }
+        }
+
+        if (typeof modalLoading !== 'undefined') modalLoading.hide();
+        const modalHistorialEl = document.getElementById('modalHistorialCotizaciones');
+        if (modalHistorialEl) {
+            const inst = bootstrap.Modal.getInstance(modalHistorialEl);
+            if (inst) inst.hide();
+        }
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('modalActaEntrega')).show();
+    } catch (error) {
+        if (typeof modalLoading !== 'undefined') modalLoading.hide();
+        console.error("Error al editar acta:", error);
+    }
+};
+
+window.reconstruirActa = async (folio) => {
+    await window.editarActa(folio, true);
+};
 
 window.generarPDFStockResumen = async (modelos, infoFiltros = {}) => {
     const { jsPDF } = window.jspdf;
